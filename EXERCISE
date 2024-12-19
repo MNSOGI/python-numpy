@@ -1,0 +1,43 @@
+import pandas as pd
+
+file_path = "path_to_your_file.tsv"
+headers = ['Device ID', 'Customer ID', 'Price', 'Alerts', 'City', 'State']
+df = pd.read_csv(file_path, sep='\t', header=None, names=headers)
+
+
+if df.isnull().values.any():
+    print("The dataset contains missing values.")
+else:
+    print("No missing values in the dataset.")
+
+
+missing_values = df.isnull().sum()
+print("\nMissing values in each column:")
+print(missing_values)
+
+
+mean_price = df['Price'].mean()
+df['Price'] = df['Price'].fillna(mean_price)
+
+df = df.dropna(subset=['Device ID', 'Customer ID'])
+
+
+total_price = df['Price'].sum()
+print(f"\nTotal price of all devices: {total_price}")
+
+
+valid_devices = df[df['Alerts'].notnull()]
+alarms_by_state = valid_devices.groupby('State')['Alerts'].sum()
+print("\nTotal number of alarms from valid devices from each state:")
+print(alarms_by_state)
+
+
+df_with_city = df.dropna(subset=['City'])
+print("\nDataset with complete City values:")
+print(df_with_city)
+
+
+mean_alarms = df['Alerts'].mean()
+devices_above_mean_alarms = df[df['Alerts'] > mean_alarms]
+print("\nDevices with more alarms than the mean:")
+print(devices_above_mean_alarms)
